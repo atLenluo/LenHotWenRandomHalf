@@ -5,10 +5,8 @@ using System.Windows.Forms;
 using LotteryLib;
 
 namespace LenHotWenHalfRandom {
-    public partial class MainForm : Form
-    {
-        struct GenCode
-        {
+    public partial class MainForm : Form {
+        struct GenCode {
             public int _curTimes;
             public List<string> _codeList;
         }
@@ -16,7 +14,7 @@ namespace LenHotWenHalfRandom {
         private string _filePath;
         private int _zhuitouTimes;
         private bool _useZhuitou = false;
-        private List<TextBox> _txtBoxList = new List<TextBox> ();
+        private List<TextBox> _txtBoxList = new List<TextBox>();
         private List<GenCode> _genCodes = new List<GenCode>();
         private int _staticsCount = 30;
         private List<ListViewItem> _itemCacheList;
@@ -24,21 +22,12 @@ namespace LenHotWenHalfRandom {
         private CodeStrategy _strategy = new CodeStrategy();
         private SortedList<string, CodeData> _codeRecords = new SortedList<string, CodeData>(new StringCompare());
 
-
         public MainForm() {
             InitializeComponent();
-            _txtBoxList.AddRange(new TextBox[]
-            {
-                txtBoxPos0,
-                txtBoxPos1,
-                txtBoxPos2,
-                txtBoxPos3,
-                txtBoxPos4,
-            });
+            _txtBoxList.AddRange(new[] {txtBoxPos0, txtBoxPos1, txtBoxPos2, txtBoxPos3, txtBoxPos4,});
         }
 
-        private void btnStart_Click(object sender, EventArgs e)
-        {
+        private void btnStart_Click(object sender, EventArgs e) {
             if (_filePath == null) return;
 
             _zhuitouTimes = int.Parse(txtBoxZhuitou.Text);
@@ -50,8 +39,8 @@ namespace LenHotWenHalfRandom {
             btnStart.Enabled = false;
             txtBoxZhuitou.Enabled = false;
 
-            for (var i = 0; i < _txtBoxList.Count; i++)
-            {
+            _genCodes.Clear();
+            for (var i = 0; i < _txtBoxList.Count; i++) {
                 GenCode genCode;
                 genCode._curTimes = 0;
                 genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
@@ -60,45 +49,38 @@ namespace LenHotWenHalfRandom {
             }
         }
 
-        private void listRecord_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-        {
-            if (_itemCacheList != null && e.ItemIndex >= _firstItem && e.ItemIndex < _firstItem + _itemCacheList.Count)
-            {
+        private void listRecord_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e) {
+            if (_itemCacheList != null && e.ItemIndex >= _firstItem &&
+                e.ItemIndex < _firstItem + _itemCacheList.Count) {
                 e.Item = _itemCacheList[e.ItemIndex - _firstItem];
-            } else
-            {
+            } else {
                 var item = new ListViewItem();
                 e.Item = item;
             }
+
             var data = _codeRecords.Values[e.ItemIndex];
             e.Item.SubItems.Clear();
             e.Item.Text = data.issue;
             e.Item.SubItems.Add(string.Join(",", data.codes));
         }
 
-        private void listRecord_DragEnter(object sender, DragEventArgs e)
-        {
+        private void listRecord_DragEnter(object sender, DragEventArgs e) {
             e.Effect = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Move : DragDropEffects.None;
         }
 
-        private void listRecord_DragDrop(object sender, DragEventArgs e)
-        {
-            if (_filePath != null)
-                return;
+        private void listRecord_DragDrop(object sender, DragEventArgs e) {
+            if (_filePath != null) return;
 
             var filePaths = e.Data.GetData(DataFormats.FileDrop) as string[];
-            if (filePaths == null || filePaths.Length <= 0)
-                return;
+            if (filePaths == null || filePaths.Length <= 0) return;
 
             var parser = new CodeParser();
             var data = parser.Parse(filePaths[0]);
-            if (data == null || data.Count <= 0)  
-                return;
+            if (data == null || data.Count <= 0) return;
 
             _filePath = filePaths[0];
             _codeRecords.Clear();
-            foreach (var item in data)
-            {
+            foreach (var item in data) {
                 _codeRecords.Add(item.issue, item);
             }
 
@@ -107,48 +89,54 @@ namespace LenHotWenHalfRandom {
             var dirName = Path.GetDirectoryName(_filePath);
             var fileName = Path.GetFileName(_filePath);
 
-            var fsw = new FileSystemWatcher(dirName, fileName)
-            {
+            var fsw = new FileSystemWatcher(dirName, fileName) {
                 NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
             };
             fsw.Changed += OnRecordFileChanged;
             fsw.EnableRaisingEvents = true;
         }
 
-        private void OnRecordFileChanged(object sender, FileSystemEventArgs e)
-        {
+        private void OnRecordFileChanged(object sender, FileSystemEventArgs e) {
             var parser = new CodeParser();
-            var list = parser.Parse(_filePath, 1);
-            if (list.Count <= 0 || _codeRecords.ContainsKey(list[0].issue)) return;
+            var list = parser.Parse(_filePath, 30);
+            if (list == null || list.Count <= 0) return;
 
-            _codeRecords.Add(list[0].issue, list[0]);
-            listRecord.Invoke(new Action(delegate()
-            {
+            var addList = new List<CodeData>();
+            foreach (var data in list) {
+                if (!_codeRecords.ContainsKey(data.issue)) {
+                    _codeRecords.Add(data.issue, data);
+                    addList.Add(data);
+                }
+            }
+
+            if (addList.Count <= 0) return;
+
+            listRecord.Invoke(new Action(delegate() {
                 listRecord.VirtualListSize = _codeRecords.Count;
             }));
 
-            for (var i = 0; i < _genCodes.Count; i++)
-            {
+            for (var i = 0; i < _genCodes.Count; i++) {
                 var genCode = _genCodes[i];
-                if (_useZhuitou)
-                {
-                    if (genCode._codeList.Contains(list[0].codes[i].ToString()))
-                    {
-                        genCode._curTimes = 0;
-                        genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
-                    } else
-                    {
-                        genCode._curTimes++;
-                        if (genCode._curTimes >= _zhuitouTimes)
-                        {
+                for (var j = addList.Count - 1; j >= 0; j--) {
+                    var data = addList[j];
+                    if (_useZhuitou) {
+                        if (genCode._codeList.Contains(data.codes[i].ToString())) {
                             genCode._curTimes = 0;
                             genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
+                            break;
                         }
+
+                        genCode._curTimes++;
+                        if (genCode._curTimes >= _zhuitouTimes) {
+                            genCode._curTimes = 0;
+                            genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
+                            break;
+                        }
+                    } else {
+                        genCode._curTimes = 0;
+                        genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
+                        break;
                     }
-                } else
-                {
-                    genCode._curTimes = 0;
-                    genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
                 }
 
                 _genCodes[i] = genCode;
@@ -156,23 +144,21 @@ namespace LenHotWenHalfRandom {
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            txtBoxZhuitou.Text = "2";
-            txtBoxStaticsCount.Text = "30";
+        private void MainForm_Load(object sender, EventArgs e) {
+            txtBoxZhuitou.Text = @"2";
+            txtBoxStaticsCount.Text = @"30";
         }
 
         private void listRecord_CacheVirtualItems(object sender, CacheVirtualItemsEventArgs e) {
-            if (_itemCacheList != null && e.StartIndex >= _firstItem && e.EndIndex <= _firstItem + _itemCacheList.Count)
-            {
+            if (_itemCacheList != null && e.StartIndex >= _firstItem &&
+                e.EndIndex <= _firstItem + _itemCacheList.Count) {
                 return;
             }
 
             _firstItem = e.StartIndex;
             int length = e.EndIndex - e.StartIndex + 1;
             _itemCacheList = new List<ListViewItem>();
-            for (int i = 0; i < length; i++)
-            {
+            for (int i = 0; i < length; i++) {
                 var item = new ListViewItem();
                 var data = _codeRecords.Values[i + e.StartIndex];
                 item.Text = data.issue;
