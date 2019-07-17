@@ -34,11 +34,6 @@ namespace LenHotWenHalfRandom {
             _useZhuitou = radioBtnZhuitou.Checked;
             _staticsCount = Convert.ToInt32(txtBoxStaticsCount.Text);
 
-            radioBtnZhuitou.Enabled = false;
-            radioBtnQiqihuan.Enabled = false;
-            btnStart.Enabled = false;
-            txtBoxZhuitou.Enabled = false;
-
             _genCodes.Clear();
             for (var i = 0; i < _txtBoxList.Count; i++) {
                 GenCode genCode;
