@@ -38,10 +38,11 @@
             this.txtBoxPos4 = new System.Windows.Forms.TextBox();
             this.btnStart = new System.Windows.Forms.Button();
             this.radioBtnZhuitou = new System.Windows.Forms.RadioButton();
-            this.radioBtnQiqihuan = new System.Windows.Forms.RadioButton();
             this.txtBoxZhuitou = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.txtBoxStaticsCount = new System.Windows.Forms.TextBox();
+            this.txtBoxNum = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // listRecord
@@ -174,7 +175,7 @@
             // 
             this.radioBtnZhuitou.AutoSize = true;
             this.radioBtnZhuitou.Checked = true;
-            this.radioBtnZhuitou.Location = new System.Drawing.Point(272, 85);
+            this.radioBtnZhuitou.Location = new System.Drawing.Point(272, 106);
             this.radioBtnZhuitou.Name = "radioBtnZhuitou";
             this.radioBtnZhuitou.Size = new System.Drawing.Size(47, 16);
             this.radioBtnZhuitou.TabIndex = 4;
@@ -182,19 +183,9 @@
             this.radioBtnZhuitou.Text = "追投";
             this.radioBtnZhuitou.UseVisualStyleBackColor = true;
             // 
-            // radioBtnQiqihuan
-            // 
-            this.radioBtnQiqihuan.AutoSize = true;
-            this.radioBtnQiqihuan.Location = new System.Drawing.Point(271, 113);
-            this.radioBtnQiqihuan.Name = "radioBtnQiqihuan";
-            this.radioBtnQiqihuan.Size = new System.Drawing.Size(59, 16);
-            this.radioBtnQiqihuan.TabIndex = 4;
-            this.radioBtnQiqihuan.Text = "期期换";
-            this.radioBtnQiqihuan.UseVisualStyleBackColor = true;
-            // 
             // txtBoxZhuitou
             // 
-            this.txtBoxZhuitou.Location = new System.Drawing.Point(338, 83);
+            this.txtBoxZhuitou.Location = new System.Drawing.Point(338, 104);
             this.txtBoxZhuitou.Name = "txtBoxZhuitou";
             this.txtBoxZhuitou.Size = new System.Drawing.Size(85, 21);
             this.txtBoxZhuitou.TabIndex = 5;
@@ -215,15 +206,32 @@
             this.txtBoxStaticsCount.Size = new System.Drawing.Size(85, 21);
             this.txtBoxStaticsCount.TabIndex = 5;
             // 
+            // txtBoxNum
+            // 
+            this.txtBoxNum.Location = new System.Drawing.Point(338, 78);
+            this.txtBoxNum.Name = "txtBoxNum";
+            this.txtBoxNum.Size = new System.Drawing.Size(85, 21);
+            this.txtBoxNum.TabIndex = 5;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(270, 81);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(53, 12);
+            this.label7.TabIndex = 6;
+            this.label7.Text = "几    码";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(454, 309);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
+            this.Controls.Add(this.txtBoxNum);
             this.Controls.Add(this.txtBoxStaticsCount);
             this.Controls.Add(this.txtBoxZhuitou);
-            this.Controls.Add(this.radioBtnQiqihuan);
             this.Controls.Add(this.radioBtnZhuitou);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.txtBoxPos4);
@@ -240,7 +248,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "冷热温各随机取一半";
+            this.Text = "冷热温自定义随机胆码";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -262,12 +270,13 @@
         private System.Windows.Forms.TextBox txtBoxPos4;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.RadioButton radioBtnZhuitou;
-        private System.Windows.Forms.RadioButton radioBtnQiqihuan;
         private System.Windows.Forms.TextBox txtBoxZhuitou;
         private System.Windows.Forms.ColumnHeader column0;
         private System.Windows.Forms.ColumnHeader column1;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtBoxStaticsCount;
+        private System.Windows.Forms.TextBox txtBoxNum;
+        private System.Windows.Forms.Label label7;
     }
 }
 

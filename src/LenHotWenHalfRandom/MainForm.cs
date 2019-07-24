@@ -13,7 +13,6 @@ namespace LenHotWenHalfRandom {
 
         private string _filePath;
         private int _zhuitouTimes;
-        private bool _useZhuitou = false;
         private List<TextBox> _txtBoxList = new List<TextBox>();
         private List<GenCode> _genCodes = new List<GenCode>();
         private int _staticsCount = 30;
@@ -21,6 +20,7 @@ namespace LenHotWenHalfRandom {
         private int _firstItem;
         private CodeStrategy _strategy = new CodeStrategy();
         private SortedList<string, CodeData> _codeRecords = new SortedList<string, CodeData>(new StringCompare());
+        private int _genCodeNum = 5;
 
         public MainForm() {
             InitializeComponent();
@@ -31,14 +31,14 @@ namespace LenHotWenHalfRandom {
             if (_filePath == null) return;
 
             _zhuitouTimes = int.Parse(txtBoxZhuitou.Text);
-            _useZhuitou = radioBtnZhuitou.Checked;
             _staticsCount = Convert.ToInt32(txtBoxStaticsCount.Text);
+            _genCodeNum = Convert.ToInt32(txtBoxNum.Text);
 
             _genCodes.Clear();
             for (var i = 0; i < _txtBoxList.Count; i++) {
                 GenCode genCode;
                 genCode._curTimes = 0;
-                genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
+                genCode._codeList = _strategy.LenHotWenRandomCustom(_codeRecords.Values, i, _staticsCount, _genCodeNum);
                 _genCodes.Add(genCode);
                 _txtBoxList[i].Text = string.Join(" ", genCode._codeList);
             }
@@ -114,34 +114,32 @@ namespace LenHotWenHalfRandom {
                 var genCode = _genCodes[i];
                 for (var j = addList.Count - 1; j >= 0; j--) {
                     var data = addList[j];
-                    if (_useZhuitou) {
-                        if (genCode._codeList.Contains(data.codes[i].ToString())) {
-                            genCode._curTimes = 0;
-                            genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
-                            break;
-                        }
-
-                        genCode._curTimes++;
-                        if (genCode._curTimes >= _zhuitouTimes) {
-                            genCode._curTimes = 0;
-                            genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
-                            break;
-                        }
-                    } else {
+                    if (genCode._codeList.Contains(data.codes[i].ToString())) {
                         genCode._curTimes = 0;
-                        genCode._codeList = _strategy.LenHotWenRandomHalf(_codeRecords.Values, i, _staticsCount);
+                        genCode._codeList = _strategy.LenHotWenRandomCustom(_codeRecords.Values, i, _staticsCount, _genCodeNum);
+                        break;
+                    }
+
+                    genCode._curTimes++;
+                    if (genCode._curTimes >= _zhuitouTimes) {
+                        genCode._curTimes = 0;
+                        genCode._codeList = _strategy.LenHotWenRandomCustom(_codeRecords.Values, i, _staticsCount, _genCodeNum);
                         break;
                     }
                 }
 
                 _genCodes[i] = genCode;
-                _txtBoxList[i].Text = string.Join(" ", _genCodes[i]._codeList);
+                Invoke(new Action<int>(delegate(int k) {
+//                    Console.WriteLine(k);
+                    _txtBoxList[k].Text = string.Join(" ", genCode._codeList);
+                }), i);
             }
         }
 
         private void MainForm_Load(object sender, EventArgs e) {
             txtBoxZhuitou.Text = @"2";
             txtBoxStaticsCount.Text = @"30";
+            txtBoxNum.Text = @"5";
         }
 
         private void listRecord_CacheVirtualItems(object sender, CacheVirtualItemsEventArgs e) {
